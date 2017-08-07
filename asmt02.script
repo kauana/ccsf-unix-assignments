@@ -1,0 +1,47 @@
+# chk -f
+./chk: line 31: 2: Error: Pathfile has not been specified. Please enter a valid pathfile.
+
+# chk -f chk
+
+chk is a file.
+chk has read permission.
+chk has write permission.
+chk has execute permission.
+
+# chk -f .
+. is a directory.
+. has read permission.
+. has write permission.
+. has execute permission.
+
+# chk -f /dev/null
+/dev/null is not a directory nor a file. It is something else.
+/dev/null has read permission.
+/dev/null has write permission.
+
+# chk -f <on a symbolic link that you create>
+# $ ls -l meow
+# lrwxrwxrwx 1 kdossant students 25 Apr 24 22:34 meow -> /students/kdossant/cs270/
+#$ chk -f meow
+meow is a symbolik link.
+
+# chk -f "my resume"
+my resume does not exist.
+
+# chk -u jstrick2
+jstrick2's current directory is: /users/jstrick2
+jstrick2 last logged in on:  Mon Nov 14 20:32:51
+
+# Extra testings:
+
+# chk -p kdossant
+Wrong command argument specified. chk works with -f or -u.
+
+# chk with a user that has never logged in:
+# chk -u rbrasil
+rbrasil's current directory is: /students/rbrasil
+rbrasil has never logged in.
+
+# chk with a user that doesn't exist
+# chk -u potato
+User does not exist. Please enter a valid user.

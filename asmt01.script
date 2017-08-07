@@ -1,0 +1,40 @@
+# line from the /etc/passwd file: kdossant:x:44441:506:Kauana:/students/kdossant:/bin/bash
+# 
+# the value of my $PATH variable: /usr/lib64/qt-3.3/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/students/kdossant/bin:.
+# 
+# the output of the uptime command:  07:38:35 up 12 days, 23:45,  8 users,  load average: 0.19, 0.18, 0.11
+# 
+# the output of the last -2 $LOGNAME command:
+# kdossant pts/5        73.223.178.207   Wed Apr 19 07:41   still logged in
+# kdossant pts/5        73.223.178.207   Wed Apr 19 07:36 - 07:39  (00:02)
+#
+# the output of the df command:
+# Filesystem           1K-blocks      Used Available Use% Mounted on
+# /dev/mapper/vg01-lv_students
+#                      257883524 162951212  81825932  67% /students
+# 
+# one run of aboutme by me:
+#
+# Welcome back, Kauana
+# Your current host is: hills.ccsf.cc.ca.us
+# Your last login was on:
+# Wed Apr 19 07:36 - 07:39 (00:02)
+# You have 28 environment variables and 38 local variables
+# The directories in your search path are:
+# /usr/lib64/qt-3.3/bin
+# /usr/local/bin
+# /bin
+# /usr/bin
+# /usr/local/sbin
+# /usr/sbin
+# /sbin
+# /students/kdossant/bin
+# .
+# Your current one minute load average is: 0.18
+# The system has been up for: 12 days
+# Your current filesystem is: /students
+# Percentage of free space is: 67%
+# MiB of free space is: 79908 
+#
+# one run of aboutme after setting the value of LOGNAME to empty:
+# ./aboutme: line 15: LOGNAME: ERROR: your LOGNAME has not been defined.

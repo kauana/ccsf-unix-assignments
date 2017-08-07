@@ -1,0 +1,103 @@
+#!/bin/bash
+# script: chk
+# Author: Kauana dos Santos
+# Created on: 04/24/2017
+# Assignment #2 - CS160B
+# Professor Joanne Strickland
+#
+# This script outputs information about Unix files and users. 
+# It uses conditional statements, gathering information from the command-line.
+# Thus, it doesn't use user input to perform its job.
+# chk can be used to check a file as follows: chk -f filepath
+# It can also be used to check a user as follows: chk -u user
+
+# chk -f filepath
+# ~ if filepath exists output: 
+# if it's a symlink (or a broken one) > no need to report permissions
+# or report what it is (file, dir, etc) and report permissions (user rwx) 
+# ~ if filepath doesn't exist (and not a symlink), say so and don't report permissions.
+# it should report instead an error message and exit with an error.
+
+# command option will be given as will be given as $1
+# test if $1 equals -f or -u
+if [ !  "$1" = "-f" ] && [ ! "$1" = "-u" ]; then
+    echo "Wrong command argument specified. chk works with -f or -u."
+    exit 1
+fi
+
+# filepath case
+if [ "$1" = "-f" ]; then
+    #first check if a pathfile was given. If $2 is empty, output an error and quit.
+    pathfile=${2:?Error: Pathfile has not been specified. Please enter a valid pathfile.}
+
+    #check if pathfile exists using test cmd argument
+    if [ -e "$pathfile" ]; then
+        # if it exists, check for a symlink using test -h
+        if [ -h "$pathfile" ]; then
+            echo "$pathfile is a symbolik link."
+            exit 1
+
+        # check if pathfile is a directory
+        elif [ -d "$pathfile" ]; then
+            echo "$pathfile is a directory."
+
+        # check if pathfile is a file
+        elif [ -f "$pathfile" ]; then
+            echo "$pathfile is a file."
+        
+        # if pathfile is not a file or a directory, classify it as something else
+        else
+            echo "$pathfile is not a directory nor a file. It is something else."  
+        fi
+
+        # Now, check filepath's permissions using test operators.
+        if [ -r "$pathfile" ]; then
+            echo "$pathfile has read permission."
+        fi
+        if [ -w "$pathfile" ]; then
+            echo "$pathfile has write permission."
+        fi
+        if [ -x "$pathfile" ]; then
+            echo "$pathfile has execute permission."
+        fi
+
+    # else case will be if file exists
+    else
+        echo "$pathfile does not exist."
+        exit 1
+    fi
+
+# user case
+elif [ "$1" = "-u" ]; then
+
+    # first check if an user was entered
+    user=${2:?Error: User has not been defined. Please enter a valid user.}
+    
+    # check if user exists
+    cut -d: -f1 /etc/passwd | grep "^$user$" > /dev/null
+    
+    # if user doesn't exist, exit script
+    if [ $? -ne 0 ]; then
+        echo "User does not exist. Please enter a valid user."
+        exit 1
+    # else user exists, perform other tasks
+    else
+        # print current dir
+        echo "$user's current directory is: $(cat /etc/passwd | grep "^$user:" | cut -d: -f6)"
+        # check if user is logged on
+        who | cut -d" " -f1 | grep "^$user$" > /dev/null
+        if [ $? -eq 0 ]; then
+            echo "$user is currently logged in."
+        else
+            # if user is not logged on, print when they last logged in
+            lastlogin=$(lastlog -u "$user" | tail -1)
+            if [[ "$lastlogin" =~ "Never logged in" ]]; then
+                echo "$user has never logged in."
+            else
+                echo "$user last logged in on:  $(echo $lastlogin | cut -d" " -f4-7)"
+            fi
+        fi
+    fi
+fi
+
+

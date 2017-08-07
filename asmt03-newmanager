@@ -1,0 +1,75 @@
+#!/bin/bash
+# Author: Kauana dos Santos
+# Created on: 04/30/2017
+# Assignment #3 - CS160B
+# Professor Joanne Strickland
+# This script retrieves data based on the input submitted by the user. 
+# The file Managers is essential in this script. 
+
+# source directory for the Managers file
+sourcedir=/pub/cs/jstrick2/cs160b/asmt03
+
+# check if file Managers is in the current directory.
+# if file exits, there is no need to copy it, so do nothing (:)
+if [ -e "Managers" ]; then
+    :
+# if file doesn't exist, copy it from source directory to current directory.
+else
+    cp $sourcedir/Managers .
+fi
+
+# Now check if file Managers has the right permission so we can use it.
+if [ -r "Managers" ]; then          # check if Managers if readable
+
+    if [ -w "Managers" ]; then      # check if Managers is writable
+        :
+    else
+        echo "Error: File Managers doesn't have write permission."
+        exit 1
+    fi
+else
+    echo "Error: File Managers doesn't have read permission." 
+    exit 1
+fi
+
+loopdone=
+while [ -z "$loopdone" ]    # while loopdone is empty, continue the loop
+do    
+    read -p "Please enter a department number:" dptnumber
+    
+    if [[ -n ${dptnumber//[0-9]/} ]]; then
+        echo "Error: Department number must be a number. Please try again."
+        continue
+    fi
+
+    # checks if department numbers already exists
+    cat Managers | cut -d':' -f3 | grep "^$dptnumber$" > /dev/null
+    
+    # if grep returns an exit status = 0, it found the dpt number
+    # so we must loop again until the user inputs a nonexistent department number
+    if [ $? -eq 0 ]; then   
+        echo "Error: This department number already exists."
+        continue
+    fi
+
+    read -p "Please enter the manager's name you wish to add:" managername
+    read -p "Please enter the manager's employee ID you wish to add:" managerid
+    read -p "Please enter the department's name in which the manager works for:" dptname
+
+    # appends all the given info to the Managers file, following the format
+    echo "$managername:$managerid:$dptnumber:$dptname" >> "Managers"
+
+    # if the user is done, ask them to press q
+    # when user is done, loopdone changes to q (not empty anymore) and while stops execution
+    read -p "To finish program enter 'q'. To continue press Enter key:" loopdone
+done
+
+# create a temporaty directory
+tempdir=$(mktemp -d)
+
+# sort Managers file numerically and put it in a temporary directory
+sort -t ':' -n -k3 Managers > $tempdir/temp
+# copy temp file to replace Managers file 
+cp $tempdir/temp Managers
+cat Managers
+

@@ -1,0 +1,64 @@
+# First run: add department number 5 (No Manager file at first, must get it from source dir)
+
+sant@hills assignment3]$ ls
+asmt03.script  newmanager
+[kdossant@hills assignment3]$ newmanager
+Please enter a department number:5
+Please enter the manager's name you wish to add:John Smith
+Please enter the manager's employee ID you wish to add:25
+Please enter the department's name in which the manager works for:Legal Services
+To finish program enter 'q'. To continue press Enter key:
+
+# Second run: a run of your shell script when a new department of your choice is added
+# (continued from first run (pressed <Enter>))
+
+Please enter a department number:100
+Please enter the manager's name you wish to add:Cute Cat
+Please enter the manager's employee ID you wish to add:100
+Please enter the department's name in which the manager works for:Department of Cuteness
+To finish program enter 'q'. To continue press Enter key:q
+Jane Scientist:14:1:Research and Development
+Charlie Ceo:1:3:Office of the President
+Sally Sliderule:622:4:Engineering
+John Smith:25:5:Legal Services
+Lawrence Friendly:833:7:Administration
+Joe Worker:489:14:Manufacturing
+Mary Money:893:17:Payroll
+Mary Mailwoman:17:45:Shipping and Receiving
+Mr. Ed:5:50:Health
+Jeri Juntz:552:77:Maintenance
+Sammy Screw:78:98:Assembly
+Cute Cat:100:100:Department of Cuteness
+Joe Piscipo:4532:200:Quality Assurance
+[kdossant@hills assignment3]$
+
+Third run: a run specifying an existing department of your choice
+
+[kdossant@hills assignment3]$ newmanager
+Please enter a department number:1
+Error: This department number already exists.
+Please enter a department number:
+
+# Extra Testings:
+
+# Check if input for department number is a number
+
+[kdossant@hills assignment3]$ newmanager
+Please enter a department number:foo
+Error: Department number must be a number. Please try again.
+
+# Run script without read permission for the Managers file
+
+[kdossant@hills assignment3]$ ls -l Managers
+--wxr-xr-x 1 kdossant students 446 May  1 19:34 Managers
+[kdossant@hills assignment3]$ newmanager
+Error: File Managers doesn't have read permission.
+
+# Run script without write permission for the Managers file
+
+[kdossant@hills assignment3]$ ls -l Managers
+-r-xr-xr-x 1 kdossant students 446 May  1 19:34 Managers
+[kdossant@hills assignment3]$ newmanager
+Error: File Managers doesn't have write permission.
+
+

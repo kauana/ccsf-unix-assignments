@@ -1,0 +1,130 @@
+#!/bin/bash
+# CS 160B - Assignment #4
+# Script name: payinfo
+# Author: Kauana dos Santos
+# Data created: 05/04/17
+# This script manages a pool of part-time employees. 
+# It gathers a list of employees and calculates their salary (regular and overtime) during the first 6 months of 2004. 
+# In addition, it outputs a summary containing the total number of employees, total regular and total overtime wages paid. 
+
+# check if first argument is right
+if [ ! $1 = "-d" ]; then
+    echo "ERROR: Please enter command option -d followed by a directory path."
+    exit 1
+fi
+
+path=${2:?Error: Path has not been specified. Please enter a valid path.}
+
+# create a temporary directory, mktemp returns address to that temp dir
+tempdir=$(mktemp -d)
+
+# create temporary dpt records with 2 digits
+cat "$path"/[DE][0-9][0-9] > $tempdir/dptrecords
+# append dpt records with 3 digits 
+cat "$path"/[DE][0-9][0-9][0-9] >> $tempdir/dptrecords
+
+dptrecords=$tempdir/dptrecords
+
+# if temp file could not be created, abort script
+if [ ! -e "$dptrecords" ]; then
+    echo "ERROR: The department records file could not be created." >&2
+    exit 1
+# if dpt records file is empty, abort script
+elif [ -z "$dptrecords" ]; then
+    echo "ERROR: There are no department records in the given directory." >&2
+    exit 1
+fi
+
+# create temporary payroll records
+cat "$path"/0[1-6][0-3][0-9][0-9][0-9] > $tempdir/payrollrecords
+
+payrollrecords=$tempdir/payrollrecords
+
+# if payroll temp file could not be created, abort script
+if [ ! -e "$payrollrecords" ]; then 
+    echo "ERROR: The payroll records file could not be created." >&2
+    exit 1
+# if payroll records file is empty, abort script
+elif [ -z "$payrollrecords" ]; then
+    echo "ERROR: There are no payroll records in the given directoty." >&2
+    exit 1
+fi
+
+totalregularpay=0
+totalovertimepay=0
+
+# for each employee id, do the following
+for id in $(cat $payrollrecords | cut -d# -f1 | sort -nu); do       # step 3
+
+    # clear hours during each iteration
+    hoursworked=0
+    overtimehours=0
+    
+    # check if employee has pay info
+    # if grep returns a nonzero exit status, there isn't a pay info for the given id 
+    cat $dptrecords | grep $id > /dev/null
+    if [ $? -ne 0 ]; then
+        echo "ERROR: There is no pay information for $id. Proceeding to next employee." >&2
+        # proceed to next employee
+        continue
+    fi
+
+    # employee's pay rate
+    payrate=$(cat $dptrecords | grep $id | cut -d: -f4) 
+
+    # overtime pay rate
+    # if there is no overtime rate for employee, let it be zero
+    if [ ! -z $(cat $dptrecords | grep $id | cut -d: -f5) ] ; then
+        overtimerate=$(cat $dptrecords | grep $id | cut -d: -f5) 
+    else
+        overtimerate=0 
+    fi
+
+    # employee's name
+    name=$(cat $dptrecords | grep $id | cut -d: -f1)   # employee's name
+
+    #hoursworked=$(cat $payrollrecords | grep $id | cut -d"#" -f2) # employee's hours worked
+    # hours worked
+    # use a for to add hours worked if there is more than one instance
+    for hours in $(cat $payrollrecords | grep $id | cut -d"#" -f2); do
+        hoursworked=$((hoursworked+$hours))
+    done
+
+    # overtime hours
+    # if employee doesn't have overtime (empty), mark it as zero
+    if [[ -z "$(cat $payrollrecords | grep $id | cut -d"#" -f3)" ]]; then
+        overtimehours=0
+    else
+        for hours in $(cat $payrollrecords | grep $id | cut -d"#" -f3); do
+        overtimehours=$((overtimehours+$hours))
+        done
+    fi
+
+    # do math
+    # payrate * worked hours (regular) + overtime rate * overtime hours
+    regularsalary=$(echo "scale=2; $payrate*$hoursworked" | bc)
+    overtimesalary=$(echo "scale=2; $overtimerate*$overtimehours" | bc)
+    totalsalaryemployee=$(echo "scale=2; $regularsalary+$overtimesalary" | bc)
+
+    numberofemployees=$((numberofemployees+1))
+
+    # accumulator to sum all regular salaries and display it in the end
+    totalregularpay=$(echo "scale=2; $totalregularpay+$regularsalary" | bc)
+    
+    # accumulator to sum all overtime salaries and display it in the end
+    totalovertimepay=$(echo "scale=2; $totalovertimepay+$overtimesalary" | bc)
+
+    # display employee data for the user
+    echo "Employee #$id ($name) earned $totalsalaryemployee during the period."
+done
+
+echo "***"
+echo "Total employees: $numberofemployees"
+echo "Total regular pay: $totalregularpay"
+echo "Total overtime pay: $totalovertimepay"
+
+
+
+
+
+

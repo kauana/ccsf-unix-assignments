@@ -1,0 +1,48 @@
+ #!/bin/bash
+#
+# script: about me
+# Author: Kauana dos Santos
+# Created on: 04/17/2017
+# Assignment #1 - CS160B
+# Professor Joanne Strickland
+# This script outputs information about the current user and about the current system such as:
+# Welcome message with user name, current host, date and time of last login (before current one),
+# amount of local and environment variables defined, directories in search path, current 
+# 1-minute load average, how long system has been up and information about current filesystem.
+# 
+
+# Script exits if LOGNAME or PATH are empty and output an error message.
+logname_error=${LOGNAME:?ERROR: your LOGNAME has not been defined.}
+path_error=${PATH:?ERROR: your PATH has not been defined.}
+
+# Prints message with name or login if name is not defined.
+name=$(finger | grep $LOGNAME | cut -d ' ' -f3 | head -1)
+echo "Welcome back," ${name:-$LOGNAME}
+
+# Prints current host.
+echo "Your current host is:" $HOSTNAME
+
+# date and time of last login, not including this time.
+echo "Your last login was on:" 
+echo "$(last $LOGNAME | tr -s " " | cut -d" " -f4- | sed -n '2p')"
+# number of environment and local variables
+allvars=$( compgen -v | wc -l )
+environmentvars=$(compgen -e | wc -l)
+localvars=$(( $allvars - $environmentvars ))
+echo "You have $environmentvars environment variables and $localvars local variables"
+
+# directories in search path, one per line
+echo "The directories in your search path are:"
+echo " $(echo $PATH | tr ":" "\n" )"
+
+# current one minute load average
+echo "Your current one minute load average is:$(uptime | cut -d, -f4 | cut -d: -f2)"
+
+# displays how long the system has been up
+echo "The system has been up for: $(uptime | cut -d, -f1 | cut -d' ' -f 4-5)"
+
+# displays current filesystem, percentage of free space, number of free Mib
+dfoutput=$(df "$PWD")
+echo "Your current filesystem is: $(echo $dfoutput | cut -d" " -f13)"
+echo "Percentage of free space is: $(echo $dfoutput | cut -d" " -f12)"
+echo "MiB of free space is: $(($(echo $dfoutput | cut -d" " -f11) / 1024))"
