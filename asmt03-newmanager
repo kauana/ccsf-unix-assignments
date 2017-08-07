@@ -4,7 +4,7 @@
 # Assignment #3 - CS160B
 # Professor Joanne Strickland
 # This script retrieves data based on the input submitted by the user. 
-# The file Managers is essential in this script. 
+# The file Managers is essential for this script to work. 
 
 # source directory for the Managers file
 sourcedir=/pub/cs/jstrick2/cs160b/asmt03
@@ -72,4 +72,3 @@ sort -t ':' -n -k3 Managers > $tempdir/temp
 # copy temp file to replace Managers file 
 cp $tempdir/temp Managers
 cat Managers
-
