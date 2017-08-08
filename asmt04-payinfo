@@ -122,9 +122,3 @@ echo "***"
 echo "Total employees: $numberofemployees"
 echo "Total regular pay: $totalregularpay"
 echo "Total overtime pay: $totalovertimepay"
-
-
-
-
-
-
